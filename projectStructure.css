@@ -1,0 +1,20 @@
+BankingAutomationSuite/
+│
+├── src/
+│   ├── main/
+│   │   └── java/
+│   │       └── utils/
+│   │           ├── ConfigReader.java
+│   │           └── DriverFactory.java
+│   └── test/
+│       ├── java/
+│       │   ├── base/
+│       │   │   └── BaseTest.java
+│       │   ├── ui/
+│       │   │   └── LoginTest.java
+│       │   └── api/
+│       │       └── AccountAPITest.java
+│       └── resources/
+│           ├── config.properties
+│           └── testdata/
+│               └── loginData.csv
