@@ -1,12 +1,11 @@
 package ui;
 
 import base.BaseTest;
+import config.CSVReader;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import utils.DriverFactory;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -16,30 +15,50 @@ import java.util.List;
 public class LoginTest extends BaseTest {
 
     @Test(dataProvider = "loginData")
-    public void testLogin(String username, String password) {
-        WebDriver driver = DriverFactory.getDriver();
-
+    public void testLoginUsingDataProvider(String username, String password) {
         driver.findElement(By.name("username")).sendKeys(username);
         driver.findElement(By.name("password")).sendKeys(password);
         driver.findElement(By.xpath("//input[@value='Log In']")).click();
 
-        // Check presence of logout link to validate login
-        boolean isLogoutPresent = driver.findElements(By.linkText("Log Out")).size() > 0;
-        Assert.assertTrue(isLogoutPresent, "Login failed for: " + username);
+        boolean isLogoutPresent = !driver.findElements(By.linkText("Log Out")).isEmpty();
+        Assert.assertTrue(isLogoutPresent, "Login failed for user: " + username);
+    }
+    @Test
+    public void testLoginUsingCSV() {
+        String csvPath = "src/test/resources/testdata/loginData.csv"; // path to your CSV
+        List<String[]> testData = CSVReader.readTestData(csvPath);
+
+        for (String[] row : testData) {
+            String username = row[0];
+            String password = row[1];
+            System.out.println("Testing login with: " + username + " / " + password);
+
+            driver.findElement(By.name("username")).sendKeys(username);
+            driver.findElement(By.name("password")).sendKeys(password);
+            driver.findElement(By.xpath("//input[@value='Log In']")).click();
+
+            boolean isLogoutPresent = !driver.findElements(By.linkText("Log Out")).isEmpty();
+            Assert.assertTrue(isLogoutPresent, "Login failed for user: " + username);
+        }
     }
 
     @DataProvider(name = "loginData")
     public Object[][] getLoginData() {
         List<Object[]> data = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("src/test/resources/testdata/loginData.csv"))) {
+        String filePath = "src/test/resources/testdata/loginData.csv";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
-                data.add(values);
+                String[] credentials = line.split(",");
+                if (credentials.length == 2) {
+                    data.add(new Object[]{credentials[0].trim(), credentials[1].trim()});
+                }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error reading login test data file");
+            throw new RuntimeException("Error reading login data from: " + filePath, e);
         }
+
         return data.toArray(new Object[0][0]);
     }
 }

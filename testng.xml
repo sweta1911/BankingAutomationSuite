@@ -1,5 +1,11 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="BankingAutomationSuite" parallel="tests" thread-count="2">
+<suite name="BankingAutomationSuite" parallel="methods" thread-count="3">
+    <listeners>
+        <listener class-name="listeners.AllureListener"/>
+        <listener class-name="listeners.RetryListener"/>
+    </listeners>
+
+
     <test name="UI Tests">
         <classes>
             <class name="ui.LoginTest"/>

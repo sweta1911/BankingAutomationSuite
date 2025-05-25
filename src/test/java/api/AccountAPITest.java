@@ -1,5 +1,6 @@
 package api;
 
+import config.ConfigReader;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -11,7 +12,8 @@ public class AccountAPITest {
 
     @BeforeClass
     public void setUp() {
-        RestAssured.baseURI = "https://parabank.parasoft.com/parabank/services/bank";
+//        RestAssured.baseURI = "https://parabank.parasoft.com/parabank/services/bank";
+        RestAssured.baseURI = ConfigReader.get("base.url");
     }
 
     @Test
