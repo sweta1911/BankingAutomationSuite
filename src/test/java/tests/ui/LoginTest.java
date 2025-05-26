@@ -1,6 +1,7 @@
 package tests.ui;
 
 import base.BaseTest;
+import customExceptions.CustomRunTimeException;
 import utils.CSVReader;
 import org.openqa.selenium.By;
 import org.testng.Assert;
@@ -61,7 +62,7 @@ public class LoginTest extends BaseTest {
                 }
             }
         } catch (Exception e) {
-            throw new CustomRunTimeException("Error reading login data from: " + filePath, e);
+            throw new CustomRunTimeException("Error reading login data from: " + filePath);
         }
 
         return data.toArray(new Object[0][0]);
