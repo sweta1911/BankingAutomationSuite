@@ -8,13 +8,13 @@
 
     <test name="UI Tests">
         <classes>
-            <class name="ui.LoginTest"/>
+            <class name="tests.ui.LoginTest"/>
         </classes>
     </test>
 
     <test name="API Tests">
         <classes>
-            <class name="api.AccountAPITest"/>
+            <class name="tests.api.AccountAPITest"/>
         </classes>
     </test>
 </suite>
