@@ -1,6 +1,6 @@
 package listeners;
 
-import config.ConfigReader;
+import utils.ConfigReader;
 import io.qameta.allure.Allure;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;

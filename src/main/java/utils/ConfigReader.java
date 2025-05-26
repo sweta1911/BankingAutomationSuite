@@ -1,4 +1,6 @@
-package config;
+package utils;
+
+import customExceptions.CustomRunTimeException;
 
 import java.io.FileInputStream;
 import java.io.IOException;

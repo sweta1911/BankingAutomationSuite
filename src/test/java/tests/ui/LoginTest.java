@@ -1,7 +1,7 @@
-package ui;
+package tests.ui;
 
 import base.BaseTest;
-import config.CSVReader;
+import utils.CSVReader;
 import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -14,8 +14,12 @@ import java.util.List;
 
 public class LoginTest extends BaseTest {
 
+    private static final org.apache.logging.log4j.Logger log = LoggerUtil.getLogger(LoginTest.class);
+
+
     @Test(dataProvider = "loginData")
     public void testLoginUsingDataProvider(String username, String password) {
+        log.info("Login status for user [{}]: {}", username, isLoggedIn);
         driver.findElement(By.name("username")).sendKeys(username);
         driver.findElement(By.name("password")).sendKeys(password);
         driver.findElement(By.xpath("//input[@value='Log In']")).click();
@@ -31,7 +35,7 @@ public class LoginTest extends BaseTest {
         for (String[] row : testData) {
             String username = row[0];
             String password = row[1];
-            System.out.println("Testing login with: " + username + " / " + password);
+            log.info("Testing login with: " + username + " / " + password);
 
             driver.findElement(By.name("username")).sendKeys(username);
             driver.findElement(By.name("password")).sendKeys(password);
@@ -56,7 +60,7 @@ public class LoginTest extends BaseTest {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error reading login data from: " + filePath, e);
+            throw new CustomRunTimeException("Error reading login data from: " + filePath, e);
         }
 
         return data.toArray(new Object[0][0]);

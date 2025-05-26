@@ -1,4 +1,4 @@
-package config;
+package customExceptions;
 
 public class CustomRunTimeException extends RuntimeException{
 
