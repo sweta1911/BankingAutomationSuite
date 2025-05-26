@@ -6,6 +6,7 @@ import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import utils.LoggerUtil;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -19,7 +20,7 @@ public class LoginTest extends BaseTest {
 
     @Test(dataProvider = "loginData")
     public void testLoginUsingDataProvider(String username, String password) {
-        log.info("Login status for user [{}]: {}", username, isLoggedIn);
+        log.info("Login for user [{}]: {}", username, password);
         driver.findElement(By.name("username")).sendKeys(username);
         driver.findElement(By.name("password")).sendKeys(password);
         driver.findElement(By.xpath("//input[@value='Log In']")).click();
