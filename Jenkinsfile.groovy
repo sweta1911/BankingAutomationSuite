@@ -1,32 +1,134 @@
 pipeline {
     agent any
 
+    environment {
+        MAVEN_OPTS = '-Xms256m -Xmx1G'
+    }
+
     tools {
-        maven 'Maven 3'  // Define in Jenkins global tools config
+        maven 'Maven 3'     // Must be defined in Jenkins Global Tool Configuration
+        jdk 'JDK 21'        // Also defined in Jenkins Global Tool Configuration
+    }
+
+    options {
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    parameters {
+        string(name: 'ENV', defaultValue: 'dev', description: 'Target environment: dev/test/prod')
     }
 
     stages {
+        stage('Preparation') {
+            steps {
+                echo "🧪 Building for environment: ${params.ENV}"
+                echo "🔀 Branch: ${env.GIT_BRANCH ?: 'master'}"
+            }
+        }
+
         stage('Checkout') {
             steps {
-                git 'https://github.com/yourusername/BankingAutomationSuite.git'
+                checkout scm
             }
         }
+
         stage('Build') {
             steps {
-                sh 'mvn clean install -DskipTests'
+                sh 'mvn clean compile'
             }
         }
-        stage('Test') {
+
+        stage('Tests') {
+            parallel {
+                stage('Unit Tests') {
+                    steps {
+                        sh 'mvn test'
+                    }
+                }
+                stage('Integration Tests') {
+                    steps {
+                        sh 'mvn verify -DskipUnitTests=true'
+                    }
+                }
+            }
+        }
+
+        stage('Package & Archive') {
             steps {
-                sh 'mvn test'
+                sh 'mvn package -DskipTests'
+                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+            }
+        }
+
+        stage('Deploy to Environment') {
+            when {
+                expression { return params.ENV != 'dev' }
+            }
+            steps {
+                echo "🚀 Deploying to ${params.ENV}..."
+                // Add your real deployment script/command here
+                sh "echo 'Deploy logic to ${params.ENV} goes here.'"
             }
         }
     }
 
     post {
+        success {
+            echo '✅ Build succeeded!'
+            junit 'target/surefire-reports/*.xml'
+
+            emailext(
+                    subject: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                    body: """
+                    <p>✅ <b>Build succeeded!</b></p>
+                    <ul>
+                        <li><b>Job:</b> ${env.JOB_NAME}</li>
+                        <li><b>Build Number:</b> ${env.BUILD_NUMBER}</li>
+                        <li><b>URL:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></li>
+                        <li><b>Environment:</b> ${params.ENV}</li>
+                    </ul>
+                    <p><b>🔍 Test Report:</b> <a href="${env.BUILD_URL}testReport">${env.BUILD_URL}testReport</a></p>
+                    <p><b>📦 Artifacts:</b> <a href="${env.BUILD_URL}artifact/">Download</a></p>
+                """,
+                    mimeType: 'text/html',
+                    attachLog: true,
+                    recipientProviders: [
+                            [$class: 'DevelopersRecipientProvider'],
+                            [$class: 'RequesterRecipientProvider'],
+                            [$class: 'CulpritsRecipientProvider']
+                    ]
+            )
+        }
+
+        failure {
+            echo '❌ Build failed.'
+            junit 'target/surefire-reports/*.xml'
+
+            emailext(
+                    subject: "❌ FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                    body: """
+                    <p>❌ <b>Build failed!</b></p>
+                    <ul>
+                        <li><b>Job:</b> ${env.JOB_NAME}</li>
+                        <li><b>Build Number:</b> ${env.BUILD_NUMBER}</li>
+                        <li><b>URL:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></li>
+                        <li><b>Environment:</b> ${params.ENV}</li>
+                    </ul>
+                    <p><b>🔧 Console Output:</b> <a href="${env.BUILD_URL}console">${env.BUILD_URL}console</a></p>
+                """,
+                    mimeType: 'text/html',
+                    attachLog: true,
+                    recipientProviders: [
+                            [$class: 'DevelopersRecipientProvider'],
+                            [$class: 'RequesterRecipientProvider'],
+                            [$class: 'CulpritsRecipientProvider']
+                    ]
+            )
+        }
+
         always {
-            junit '**/target/surefire-reports/*.xml'
+            cleanWs()
         }
     }
 }
-
