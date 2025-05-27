@@ -2,16 +2,16 @@ pipeline {
     agent any
 
     stages {
-        stage('Start') {
+        stage('Checkout') {
             steps {
-                echo '✅ Jenkinsfile loaded successfully!'
+                git 'https://github.com/sweta1911/BankingAutomationSuite.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("banking-tests")
+                    docker.build("bankingautomationsuite:latest")
                 }
             }
         }
@@ -19,8 +19,8 @@ pipeline {
         stage('Run Tests in Docker') {
             steps {
                 script {
-                    docker.image("banking-tests").inside {
-                        sh 'echo "🧪 Running tests inside Docker container..."'
+                    docker.image("bankingautomationsuite:latest").inside {
+                        sh 'echo "✅ Running tests inside Docker container..."'
                         sh 'mvn clean test'
                     }
                 }
