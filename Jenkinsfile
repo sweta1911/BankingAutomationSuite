@@ -54,7 +54,18 @@ pipeline {
                 }
             }
         }
-
+        stage('Run Tests Inside Docker') {
+            steps {
+                script {
+                    docker.image("${IMAGE_NAME}").inside {
+                        // Print hostname or OS info
+                        sh 'echo "Running inside container: $(hostname)"'
+                        sh 'cat /etc/os-release || ver' // For Linux/Windows
+                        sh 'mvn clean test'
+                    }
+                }
+            }
+        }
         stage('Package & Archive') {
             steps {
                 sh 'mvn package -DskipTests'

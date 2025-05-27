@@ -13,6 +13,8 @@ public class BaseTest {
     public void setUp() {
         driver = DriverFactory.getDriver();
         driver.get(ConfigReader.get("baseUrl"));
+        System.out.println("Running on OS: " + System.getProperty("os.name"));
+        System.out.println("Java Version: " + System.getProperty("java.version"));
     }
 
     @AfterMethod
