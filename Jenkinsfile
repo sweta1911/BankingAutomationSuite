@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        MAVEN_OPTS = '-Xms256m -Xmx1G'
+//         MAVEN_OPTS = '-Xms256m -Xmx1G'
+        DOCKER_IMAGE = 'bankingautomationsuite:latest'
     }
 
     tools {
