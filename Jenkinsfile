@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Test') {
             steps {
-                echo '✅ Jenkinsfile is working and running in Jenkins'
+                echo '✅ Jenkinsfile is working and executing!'
             }
         }
     }
